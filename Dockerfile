@@ -1,7 +1,7 @@
 # Imagen base con PHP-FPM
 FROM php:8.2-fpm
 
-# Instalar extensiones y dependencias para Laravel
+# Instalar extensiones y dependencias para Laravel + Nginx
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
@@ -9,32 +9,31 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     nginx \
- && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Instalar Composer desde la imagen oficial
+# Instalar Composer (desde la imagen oficial)
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Configurar directorio de trabajo
+# Directorio de trabajo
 WORKDIR /var/www
 
-# Copiar archivos de Composer y instalar dependencias de Laravel
+# Copiar Composer e instalar dependencias
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-scripts --no-progress
 
-# Copiar el resto de la aplicación
+# Copiar el resto del proyecto
 COPY . .
 
-# Ajustar permisos (según necesidad)
+# Ajustar permisos (si lo requieres)
 RUN chown -R www-data:www-data /var/www
 
-# Copiar configuración de Nginx (debes crear este archivo)
+# Copiar configuración de Nginx y el script de entrada
 COPY docker/nginx.conf /etc/nginx/nginx.conf
-
-# Exponer el puerto 80 (servido por Nginx)
-EXPOSE 8080
-
-# Usar un script de entrada para iniciar ambos servicios
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Expones el puerto 8080 (Nginx escucha en 8080)
+EXPOSE 8080
+
+# El CMD iniciará Nginx y PHP-FPM
 CMD ["/entrypoint.sh"]

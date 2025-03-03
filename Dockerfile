@@ -22,21 +22,25 @@ RUN php artisan config:cache && \
 FROM php:8.1-fpm-alpine
 WORKDIR /var/www
 
-# Instalar dependencias del sistema necesarias para las extensiones de PHP,
-# incluida zlib-dev para que GD encuentre zlib.
-RUN apk add --no-cache libpng libjpeg-turbo libwebp freetype zlib-dev
+# Instalar dependencias de desarrollo para compilar GD y demás extensiones
+RUN apk add --no-cache \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libwebp-dev \
+    zlib-dev
 
 # Configurar e instalar la extensión GD y las extensiones de PDO para MySQL
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
     docker-php-ext-install gd pdo pdo_mysql
 
-# Copiar los archivos construidos en la etapa builder
+# Copiar los archivos construidos desde la etapa builder
 COPY --from=builder /app /var/www
 
 # Ajustar permisos en directorios críticos de Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Exponer el puerto (ajusta este valor según tu configuración, por ejemplo 8080 o 9000)
+# Exponer el puerto (ajusta según tu configuración, por ejemplo 8080 o 9000)
 EXPOSE 8080
 
 # Comando para iniciar PHP-FPM

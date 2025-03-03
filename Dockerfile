@@ -40,7 +40,7 @@ COPY --from=builder /app /var/www
 # Ajustar permisos en directorios críticos de Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Exponer el puerto (ajusta según tu configuración, por ejemplo 8080 o 9000)
+# Exponer el puerto (ajusta según tu configuración, por ejemplo 8080)
 EXPOSE 8080
 
 # Comando para iniciar PHP-FPM

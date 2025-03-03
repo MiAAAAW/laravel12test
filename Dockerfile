@@ -1,33 +1,40 @@
-# Usa una imagen de PHP con FPM
+# Imagen base con PHP-FPM
 FROM php:8.2-fpm
 
-# Instala dependencias necesarias para Laravel
+# Instalar extensiones y dependencias para Laravel
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
     zip \
     unzip \
-    git \
+    nginx \
  && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Instala Composer (usando la imagen de composer)
+# Instalar Composer desde la imagen oficial
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Configurar directorio de trabajo
 WORKDIR /var/www
 
-# Copia archivos de Composer e instala las dependencias
+# Copiar archivos de Composer y instalar dependencias de Laravel
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-scripts --no-progress
 
-# Copia el resto del código de Laravel
+# Copiar el resto de la aplicación
 COPY . .
 
-# Ajusta permisos (según necesites)
+# Ajustar permisos (según necesidad)
 RUN chown -R www-data:www-data /var/www
 
-# Expone el puerto en el que PHP-FPM escucha (usualmente 9000)
-EXPOSE 9000
+# Copiar configuración de Nginx (debes crear este archivo)
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-# Inicia PHP-FPM
-CMD ["php-fpm"]
+# Exponer el puerto 80 (servido por Nginx)
+EXPOSE 8080
+
+# Usar un script de entrada para iniciar ambos servicios
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]

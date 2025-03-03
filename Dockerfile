@@ -1,38 +1,33 @@
-FROM php:8.2-fpm
+# Etapa de construcción: instala las dependencias sin paquetes de desarrollo
+FROM composer:2 AS builder
+WORKDIR /app
 
-# Instalar dependencias para Laravel y Nginx
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    git \
-    nginx \
- && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-
-# Instalar Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www
-
-# Copiar archivos de Composer e instalar dependencias
+# Copiar archivos de Composer y descargar las dependencias
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-scripts --no-progress
 
-# Copiar el resto del proyecto Laravel
+# Copiar el resto del código de la aplicación
 COPY . .
 
-# Ajustar permisos para storage y bootstrap/cache
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
-    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+# Opcional: optimizar la configuración de Laravel
+RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
 
-# Copiar configuración de Nginx y el entrypoint
-COPY docker/nginx.conf /etc/nginx/nginx.conf
-COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Etapa final: prepara la imagen de producción con PHP-FPM
+FROM php:8.1-fpm-alpine
+WORKDIR /var/www
 
-# Exponer el puerto 8080 (Nginx escucha en 8080 en el contenedor)
+# Instalar dependencias del sistema necesarias para algunas extensiones
+RUN apk add --no-cache libpng libjpeg-turbo libwebp freetype
+
+# Configurar e instalar la extensión gd y las extensiones de PDO para MySQL
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
+    docker-php-ext-install gd pdo pdo_mysql
+
+# Copiar los archivos construidos desde la etapa anterior
+COPY --from=builder /app /var/www
+
+# Ajustar permisos para directorios críticos de Laravel
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
 EXPOSE 8080
-
-CMD ["/entrypoint.sh"]
+CMD ["php-fpm"]

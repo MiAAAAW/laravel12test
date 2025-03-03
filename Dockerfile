@@ -16,18 +16,18 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Copia los archivos de Composer e instala dependencias
+# Copiar archivos de Composer e instalar dependencias
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-scripts --no-progress
 
-# Copia el resto del proyecto Laravel
+# Copiar el resto del proyecto Laravel
 COPY . .
 
-# Ajustar permisos para storage y bootstrap/cache (puedes hacerlo aquí o en el entrypoint)
+# Ajustar permisos para storage y bootstrap/cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
     chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Copia la configuración de Nginx y el entrypoint
+# Copiar configuración de Nginx y el entrypoint
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

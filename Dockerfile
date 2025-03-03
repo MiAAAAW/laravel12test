@@ -19,7 +19,7 @@ RUN php artisan config:cache && \
 ##############################
 # ETAPA 2: Imagen Final para Producción
 ##############################
-FROM php:8.1-fpm-alpine
+FROM php:8.2-fpm-alpine
 WORKDIR /var/www
 
 # Instalar dependencias de desarrollo para compilar GD y demás extensiones

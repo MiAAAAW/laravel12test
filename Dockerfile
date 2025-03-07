@@ -13,9 +13,6 @@ COPY . .
 # Instalar dependencias de Composer
 RUN composer install
 
-# Copiar el archivo de configuración de PHP personalizado
-COPY php.ini /usr/local/etc/php/conf.d/php.ini
-
 # Exponer el puerto en el que se ejecutará la aplicación
 EXPOSE 9000
 

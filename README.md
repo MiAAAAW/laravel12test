@@ -49,6 +49,87 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 - **[byte5](https://byte5.de)**
 - **[OP.GG](https://op.gg)**
 
+## Configuration COOLIFY + LARAVEL ACORDING
+
+# Configuración de Coolify en Environment Variables luego de cargar el GitHub de Laravel 12
+
+Este documento describe las variables de entorno utilizadas en un proyecto **Laravel 12**, tal como se configurarían en **Coolify** después de cargar el repositorio desde GitHub. Además, se detalla la configuración de **Network** en Coolify para exponer y mapear los puertos correspondientes.
+
+---
+
+# Configuración de Network en Coolify
+
+En la sección **Network** de Coolify, es necesario exponer y mapear el puerto en el que se ejecuta la aplicación. Por ejemplo, si tu aplicación corre en el puerto `8080`, podrías configurar:
+
+- **Ports Exposed**: `8080`  
+- **Ports Mappings**: `8080:8080`  
+
+De esta forma, Coolify redirige las peticiones externas al puerto interno de la aplicación. Asegúrate de que tu aplicación Laravel esté escuchando en el puerto configurado (en este ejemplo, el 8080).
+
+---
+
+# Variables de Entorno PARA SUBIR ALSO ON COOLIFY MODULE
+
+```bash
+APP_DEBUG=true
+APP_ENV=local
+APP_FAKER_LOCALE=en_US
+APP_FALLBACK_LOCALE=en
+APP_KEY=base64:wXk3BYBatrOch/bQAkEuNcBTvED4qaPV7TtjX73tUy0=
+APP_LOCALE=en
+APP_MAINTENANCE_DRIVER=file
+APP_NAME=Laravel
+APP_URL=http://localhost:8081/
+
+AWS_ACCESS_KEY_ID=
+AWS_BUCKET=
+AWS_DEFAULT_REGION=us-east-1
+AWS_SECRET_ACCESS_KEY=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+BCRYPT_ROUNDS=12
+BROADCAST_CONNECTION=log
+CACHE_STORE=array
+
+DB_CONNECTION=sqlite
+
+FILESYSTEM_DISK=local
+
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+LOG_STACK=single
+
+MAIL_FROM_ADDRESS=hello@example.com
+MAIL_FROM_NAME=${APP_NAME}
+MAIL_HOST=127.0.0.1
+MAIL_MAILER=log
+MAIL_PASSWORD=null
+MAIL_PORT=2525
+MAIL_SCHEME=null
+MAIL_USERNAME=null
+
+MEMCACHED_HOST=127.0.0.1
+
+PHP_CLI_SERVER_WORKERS=4
+
+QUEUE_CONNECTION=sync
+
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+SESSION_DOMAIN=null
+SESSION_DRIVER=array
+SESSION_ENCRYPT=false
+SESSION_LIFETIME=120
+SESSION_PATH=/
+
+VITE_APP_NAME=${APP_NAME}
+
+
+
 ## Contributing
 
 Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).

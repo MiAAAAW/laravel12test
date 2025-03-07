@@ -10,33 +10,22 @@ services:
     working_dir: /var/www
     volumes:
       - .:/var/www
-    environment:
-      APP_ENV: production
-      DB_CONNECTION: pgsql
-      DB_HOST: ${DB_HOST}  # Nombre del servicio de BD en Coolify
-      DB_PORT: ${DB_PORT}
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-    depends_on:
-      - nginx
+      - ./php.ini:/usr/local/etc/php/conf.d/php.ini
     networks:
-      - coolify-network
+      - laravel
 
-  nginx:
+  webserver:
     image: nginx:alpine
-    container_name: laravel_nginx
+    container_name: laravel_webserver
     restart: unless-stopped
     ports:
       - "8000:80"
     volumes:
       - .:/var/www
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - app
     networks:
-      - coolify-network
+      - laravel
 
 networks:
-  coolify-network:
-    external: true  # Usamos la red de Coolify para conectar Laravel con la BD
+  laravel:
+    driver: bridge

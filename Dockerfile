@@ -1,32 +1,23 @@
-# Imagen base con PHP 8.2 y FPM
+# Usar una imagen base oficial de PHP
 FROM php:8.2-fpm
 
-# Instalar dependencias del sistema y extensiones de PHP
-RUN apt-get update && apt-get install -y \
-    git unzip curl libpng-dev libjpeg-dev libfreetype6-dev \
-    libonig-dev libxml2-dev zip supervisor \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+# Instalar extensiones de PHP necesarias para Laravel
+RUN docker-php-ext-install pdo pdo_mysql
 
-# Instalar Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Establecer directorio de trabajo
+# Establecer el directorio de trabajo en el contenedor
 WORKDIR /var/www
 
-# Copiar archivos del proyecto
+# Copiar los archivos de la aplicación al contenedor
 COPY . .
 
-# Instalar dependencias de Laravel
-RUN composer install --no-dev --optimize-autoloader
+# Instalar dependencias de Composer
+RUN composer install
 
-# Asignar permisos correctos
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Copiar el archivo de configuración de PHP personalizado
+COPY php.ini /usr/local/etc/php/conf.d/php.ini
 
-# Exponer el puerto de PHP-FPM
+# Exponer el puerto en el que se ejecutará la aplicación
 EXPOSE 9000
 
-# Configurar Supervisor
-COPY supervisor.conf /etc/supervisor/conf.d/supervisor.conf
-
-# Ejecutar Supervisor al iniciar el contenedor
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisor.conf"]
+# Comando para ejecutar el contenedor
+CMD ["php-fpm"]
